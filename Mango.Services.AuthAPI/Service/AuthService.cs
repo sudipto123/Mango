@@ -3,6 +3,7 @@ using Mango.Services.AuthAPI.Models;
 using Mango.Services.AuthAPI.Models.Dto;
 using Mango.Services.AuthAPI.Service.IService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Mango.Services.AuthAPI.Service
 {
@@ -24,9 +25,39 @@ namespace Mango.Services.AuthAPI.Service
 			throw new NotImplementedException();
 		}
 
-		public Task<UserDto> Register(RegistrationRequestDto registrationRequestDto)
+		public async Task<UserDto> Register(RegistrationRequestDto registrationRequestDto)
 		{
-			throw new NotImplementedException();
+			ApplicationUser user = new()
+			{
+				UserName = registrationRequestDto.Email,
+				Email = registrationRequestDto.Email,
+				NormalizedEmail = registrationRequestDto.Email.ToUpper(),
+				Name = registrationRequestDto.Name,
+				PhoneNumber = registrationRequestDto.PhoneNumber
+			};
+
+			try 
+			{ 
+				var result = await _userManager.CreateAsync(user, registrationRequestDto.Password);
+				if (result.Succeeded)
+				{
+					var userToReturn = _db.ApplcationUsers.First(u => u.UserName == registrationRequestDto.Email);
+
+					UserDto userDto = new()
+					{
+						Email = registrationRequestDto.Email,
+						ID = userToReturn.Id,
+						Name = userToReturn.Name,
+						PhoneNumber = userToReturn.PhoneNumber
+					};
+					return userDto;
+				}				
+			}
+			catch (Exception ex)
+			{
+
+			}
+			return new UserDto();
 		}
 	}
 }
