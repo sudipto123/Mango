@@ -1,4 +1,5 @@
-﻿using Mango.Web.Models.Dto;
+﻿using Mango.Web.Models;
+using Mango.Web.Models.Dto;
 using Mango.Web.Service.IService;
 using Mango.Web.Utility;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,36 @@ namespace Mango.Web.Controllers
 			return View();
 		}
 
-        public IActionResult Logout()
+		[HttpPost]
+		public async Task<IActionResult> Register(RegistrationRequestDto obj)
+		{
+			ResponseDto result = await _authService.RegisterAsync(obj);
+			ResponseDto assignRole;
+
+			if(result != null && result.IsSuccess)
+			{
+				if(string.IsNullOrEmpty(obj.Role))
+				{
+					obj.Role = SD.RoleCustomer;
+				}
+				assignRole = await _authService.AssignRoleAsync(obj);
+				if(assignRole != null && assignRole.IsSuccess)
+				{
+					TempData["success"] = "Registration successful";
+					return RedirectToAction(nameof(Login));
+				}
+			}
+
+			var roleList = new List<SelectListItem>()
+			{
+				new SelectListItem { Text = SD.RoleAdmin, Value= SD.RoleAdmin },
+				new SelectListItem { Text = SD.RoleCustomer, Value= SD.RoleCustomer }
+			};
+			ViewBag.RoleList = roleList;
+			return View(obj);
+		}
+
+		public IActionResult Logout()
         {
             return View();
         }
