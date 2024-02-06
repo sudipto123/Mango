@@ -75,11 +75,11 @@ namespace Mango.Services.ProductAPI.Controllers
         }
         [HttpPut]
 		[Authorize(Roles = "ADMIN")]
-		public ResponseDto Put([FromBody] ProductDto couponDto)
+		public ResponseDto Put([FromBody] ProductDto productDto)
         {
             try
             {
-                Product obj = _mapper.Map<Product>(couponDto);
+                Product obj = _mapper.Map<Product>(productDto);
                 _db.Products.Update(obj);
                 _db.SaveChanges();
 
