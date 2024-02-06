@@ -30,7 +30,7 @@
                                 </div>
                             </div>
                             <div class="row mx-0">
-                                <input class="form-control" />
+                                <input asp-for="Count" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -48,3 +48,6 @@
     </div>
 </form>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
